@@ -22,13 +22,15 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
-      # 3. project.pbxproj에서 DEVELOPMENT_TEAM 및 CODE_SIGN_STYLE 제거
+      # 3. project.pbxproj에서 서명 및 아키텍처 설정 제거
       - name: Update project.pbxproj
         run: |
-          sed -i '' 's/DEVELOPMENT_TEAM = "[^"]*"/DEVELOPMENT_TEAM = ""/' wkwebview.xcodeproj/project.pbxproj || true
+          sed -i '' '/DEVELOPMENT_TEAM =/d' wkwebview.xcodeproj/project.pbxproj || true
           sed -i '' 's/CODE_SIGN_STYLE = "[^"]*"/CODE_SIGN_STYLE = None/' wkwebview.xcodeproj/project.pbxproj || true
           sed -i '' 's/ARCHS = "[^"]*"/ARCHS = arm64/' wkwebview.xcodeproj/project.pbxproj || true
           sed -i '' 's/VALID_ARCHS = "[^"]*"/VALID_ARCHS = arm64/' wkwebview.xcodeproj/project.pbxproj || true
+          sed -i '' 's/CODE_SIGN_IDENTITY = "[^"]*"/CODE_SIGN_IDENTITY = ""/' wkwebview.xcodeproj/project.pbxproj || true
+          sed -i '' 's/PROVISIONING_PROFILE = "[^"]*"/PROVISIONING_PROFILE = ""/' wkwebview.xcodeproj/project.pbxproj || true
 
       # 4. 프로젝트 빌드 (서명 비활성화)
       - name: Build Project without Signing
@@ -60,6 +62,10 @@ jobs:
             <key>method</key>
             <string>development</string>
             <key>compileBitcode</key>
+            <false/>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>stripSwiftSymbols</key>
             <false/>
           </dict>
           </plist>
