@@ -22,7 +22,15 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
-      # 3. 프로젝트 빌드 (서명 비활성화)
+      # 3. project.pbxproj에서 DEVELOPMENT_TEAM 및 CODE_SIGN_STYLE 제거
+      - name: Update project.pbxproj
+        run: |
+          sed -i '' 's/DEVELOPMENT_TEAM = "[^"]*"/DEVELOPMENT_TEAM = ""/' wkwebview.xcodeproj/project.pbxproj || true
+          sed -i '' 's/CODE_SIGN_STYLE = "[^"]*"/CODE_SIGN_STYLE = None/' wkwebview.xcodeproj/project.pbxproj || true
+          sed -i '' 's/ARCHS = "[^"]*"/ARCHS = arm64/' wkwebview.xcodeproj/project.pbxproj || true
+          sed -i '' 's/VALID_ARCHS = "[^"]*"/VALID_ARCHS = arm64/' wkwebview.xcodeproj/project.pbxproj || true
+
+      # 4. 프로젝트 빌드 (서명 비활성화)
       - name: Build Project without Signing
         run: |
           xcodebuild \
@@ -41,7 +49,7 @@ jobs:
             SKIP_INSTALL=NO \
             BUILD_LIBRARY_FOR_DISTRIBUTION=NO
 
-      # 4. .ipa 파일 생성
+      # 5. .ipa 파일 생성
       - name: Export IPA
         run: |
           cat > exportOptions.plist << 'EOF'
@@ -50,7 +58,7 @@ jobs:
           <plist version="1.0">
           <dict>
             <key>method</key>
-            <string>debugging</string>
+            <string>development</string>
             <key>compileBitcode</key>
             <false/>
           </dict>
@@ -62,14 +70,14 @@ jobs:
             -exportPath build \
             -exportOptionsPlist exportOptions.plist
 
-      # 5. .ipa 파일 아티팩트 업로드
+      # 6. .ipa 파일 아티팩트 업로드
       - name: Upload IPA for AltStore
         uses: actions/upload-artifact@v4
         with:
           name: wkwebview-demo-ipa
           path: build/wkwebview-demo.ipa
 
-      # 6. 정리
+      # 7. 정리
       - name: Cleanup
         if: always()
         run: |
