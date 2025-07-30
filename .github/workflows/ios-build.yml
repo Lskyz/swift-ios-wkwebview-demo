@@ -36,7 +36,9 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE="" \
             ARCHS=arm64 \
-            VALID_ARCHS=arm64
+            VALID_ARCHS=arm64 \
+            SKIP_INSTALL=NO \
+            BUILD_LIBRARY_FOR_DISTRIBUTION=NO
 
       # 4. .ipa 파일 생성
       - name: Export IPA
@@ -52,8 +54,6 @@ jobs:
             <string>manual</string>
             <key>compileBitcode</key>
             <false/>
-            <key>teamID</key>
-            <string></string>
           </dict>
           </plist>
           EOF
